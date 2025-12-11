@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ICAO Phonetic Character Viewer</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 40px;
+    }
+    textarea {
+        width: 100%;
+        height: 120px;
+        font-size: 18px;
+        font-family: monospace;
+    }
+    #output {
+        margin-top: 20px;
+        white-space: pre;
+        font-family: monospace;
+        background: #f4f4f4;
+        padding: 8px;
+        border-radius: 8px;
+        line-height: 1;
+    }
+    .line {
+        margin: 0;
+        padding: 0;
+        line-height: 1;
+    }
+    .col-index    { width: 4ch;  display: inline-block; }
+    .col-char     { width: 4ch;  display: inline-block; }
+    .col-case     { width: 12ch; display: inline-block; }
+    .col-phonetic { width: 20ch; display: inline-block; }
+    .upper   { color: #0066ff; font-weight: bold; }
+    .lower   { color: #009933; font-weight: bold; }
+    .number  { color: #ff8800; font-weight: bold; }
+    .symbol  { color: #cc0000; font-weight: bold; }
+</style>
+</head>
+<body>
+<h2>Phonetic Breakdown</h2>
+<p>Use this tool to present text in an internationally recognized phonetic representation. This can help when sharing information over the phone. Type text below:</p>
+<textarea id="input"></textarea>
+<br><br>
+<button onclick="processText()">Show Phonetics</button>
+<div id="output"></div>
+<script>
+const ICAO = {
+    "a":"Alfa","b":"Bravo","c":"Charlie","d":"Delta","e":"Echo",
+    "f":"Foxtrot","g":"Golf","h":"Hotel","i":"India","j":"Juliett",
+    "k":"Kilo","l":"Lima","m":"Mike","n":"November","o":"Oscar",
+    "p":"Papa","q":"Quebec","r":"Romeo","s":"Sierra","t":"Tango",
+    "u":"Uniform","v":"Victor","w":"Whiskey","x":"X-ray","y":"Yankee",
+    "z":"Zulu",
+    "0":"Zero","1":"One","2":"Two","3":"Three","4":"Four",
+    "5":"Fife","6":"Six","7":"Seven","8":"Eight","9":"Niner",
+    " ":"Space",
+    "\n":"Newline"
+};
+const SYMBOLS = {
+    ".":"Period", ",":"Comma", "!":"Exclamation mark", "?":"Question mark",
+    ":":"Colon", ";":"Semicolon", "-":"Hyphen", "_":"Underscore",
+    "'":"Apostrophe", "\"":"Quotation mark",
+    "(":"Left parenthesis", ")":"Right parenthesis",
+    "[":"Left bracket", "]":"Right bracket",
+    "{":"Left brace", "}":"Right brace",
+    "/":"Forward slash", "\\":"Backslash",
+    "|":"Vertical bar",
+    "@":"At sign", "#":"Hash", "$":"Dollar sign",
+    "%":"Percent", "^":"Caret", "&":"Ampersand",
+    "*":"Asterisk", "+":"Plus", "=":"Equals",
+    "<":"Less than", ">":"Greater than",
+    "~":"Tilde", "`":"Backtick"
+};
+function classify(char) {
+    if (/[A-Z]/.test(char)) return { cls:"upper", label:"(uppercase)" };
+    if (/[a-z]/.test(char)) return { cls:"lower", label:"(lowercase)" };
+    if (/[0-9]/.test(char)) return { cls:"number", label:"(number)" };
+    return { cls:"symbol", label:"(symbol)" };
+}
+function processText() {
+    const text = document.getElementById("input").value;
+    const output = document.getElementById("output");
+    let html = "";
+    let index = 1;
+    for (let char of text) {
+        const lower = char.toLowerCase();
+        const type = classify(char);
+        const phon = ICAO[lower] || SYMBOLS[char] || "(unknown)";
+        html += `<div class="line"><span class="col-index">${index}</span><span class="col-char ${type.cls}">${char}</span><span class="col-case">${type.label}</span><span class="col-phonetic">${phon}</span></div>`;
+        index++;
+    }
+    output.innerHTML = html;
+}
+</script>
+</body>
+</html>
